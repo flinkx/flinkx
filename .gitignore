@@ -1,0 +1,44 @@
+# Created by .ignore support plugin (hsz.mobi)
+nohup.out
+HELP.md
+jobs/
+plugins/
+lib/
+flinkconf/
+hadoopconf/
+/target/
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*/target/*
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea/
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+/build/
+
+### VS Code ###
+.vscode/
+.DS_Store
+*/.DS_Store
+
+
+/default_task_id_output
