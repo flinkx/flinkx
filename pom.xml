@@ -13,6 +13,7 @@
         <module>flinkx-rdb</module>
         <module>flinkx-mysql</module>
         <module>flinkx-stream</module>
+        <module>flinkx-file</module>
     </modules>
 
     <properties>
