@@ -12,7 +12,11 @@
     <artifactId>flinkx-file-writer</artifactId>
 
     <dependencies>
-
+        <dependency>
+            <groupId>com.flink.flinkx</groupId>
+            <artifactId>flinkx-file-core</artifactId>
+            <version>1.8</version>
+        </dependency>
     </dependencies>
 
     <build>
