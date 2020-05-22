@@ -47,6 +47,7 @@ public class FileInputFormat extends BaseRichInputFormat{
 
     @Override
     protected InputSplit[] createInputSplitsInternal(int minNumSplits) throws Exception {
+        IFileHandler fileHandler = new FileHandler();
         List<String> files = new ArrayList<>();
         String path = fileConfig.getPath();
         if(path != null && path.length() > 0){
@@ -57,20 +58,20 @@ public class FileInputFormat extends BaseRichInputFormat{
             }
         }
         int numSplits = (Math.min(files.size(), minNumSplits));
-        FtpInputSplit[] ftpInputSplits = new FtpInputSplit[numSplits];
+        FileInputSplit[] fileInputSplits = new FileInputSplit[numSplits];
         for(int index = 0; index < numSplits; ++index) {
-            ftpInputSplits[index] = new FtpInputSplit();
+            fileInputSplits[index] = new FileInputSplit();
         }
         for(int i = 0; i < files.size(); ++i) {
-            ftpInputSplits[i % numSplits].getPaths().add(files.get(i));
+            fileInputSplits[i % numSplits].getPaths().add(files.get(i));
         }
 
-        return ftpInputSplits;
+        return fileInputSplits;
     }
 
     @Override
     protected void openInternal(InputSplit split) throws IOException {
-        FtpInputSplit inputSplit = (FtpInputSplit)split;
+        FileInputSplit inputSplit = (FileInputSplit)split;
         List<String> paths = inputSplit.getPaths();
 
         if (fileConfig.getIsFirstLineHeader()){

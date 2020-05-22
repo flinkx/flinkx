@@ -1,15 +1,17 @@
 package com.flink.flinkx.file;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,14 +30,14 @@ public class FileHandler implements IFileHandler {
     public boolean isDirExist(String directoryPath) {
         String dirPath = new String(directoryPath.getBytes(StandardCharsets.UTF_8));
         File file = new File(dirPath);
-        return file.exists();
+        return file.isDirectory();
     }
 
     @Override
     public boolean isFileExist(String filePath) {
         String _path = new String(filePath.getBytes(StandardCharsets.UTF_8));
         File file = new File(_path);
-        return file.exists();
+        return file.isFile();
     }
 
     @Override
@@ -53,16 +55,97 @@ public class FileHandler implements IFileHandler {
 
     @Override
     public List<String> listDirs(String path) {
-        return null;
+        List<String> sources = new ArrayList<>();
+        if(isDirExist(path)) {
+            if(!path.endsWith(SP)) {
+                path = path + SP;
+            }
+        }
+        File file = new File(path);
+        //返回目录下所有的文件以及文件夹对象
+        File[] files = file.listFiles();
+        if(files != null) {
+            for(File ftpFile : files) {
+                sources.add(path + ftpFile.getName());
+            }
+        }
+        return sources;
     }
 
     @Override
     public List<String> getFiles(String path) {
-        return null;
+        List<String> sources = new ArrayList<>();
+        if(isDirExist(path)) {
+            if(!path.endsWith(SP)) {
+                path = path + SP;
+            }
+            File file = new File(path);
+            //返回目录下所有的文件以及文件夹对象
+            File[] files = file.listFiles();
+            if(files != null) {
+                for(File ftpFile : files) {
+                    sources.add(path + ftpFile.getName());
+                }
+            }
+        } else if(isFileExist(path)) {
+            sources.add(path);
+            return sources;
+        }
+        return sources;
     }
 
     @Override
     public void mkDirRecursive(String directoryPath) {
+        StringBuilder dirPath = new StringBuilder();
+        dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
+        String[] dirSplit = StringUtils.split(directoryPath,IOUtils.DIR_SEPARATOR_UNIX);
+        String message = String.format("创建目录:%s时发生异常,请确认file路径正常,拥有目录创建权限", directoryPath);
+        try {
+            // ftp server不支持递归创建目录,只能一级一级创建
+            for(String dirName : dirSplit) {
+                dirPath.append(dirName);
+                boolean mkdirSuccess = mkDirSingleHierarchy(dirPath.toString());
+                dirPath.append(IOUtils.DIR_SEPARATOR_UNIX);
+                if(!mkdirSuccess){
+                    throw new RuntimeException(message);
+                }
+            }
 
+        }catch  (Exception e) {
+            message = String.format("%s, errorMessage:%s", message,
+                    e.getMessage());
+            LOG.error(message);
+            throw new RuntimeException(message, e);
+        }
+
+    }
+
+    @Override
+    public OutputStream getOutputStream(String filePath) {
+        return null;
+    }
+
+    @Override
+    public void deleteAllFilesInDir(String dir, List<String> exclude) {
+
+    }
+
+    @Override
+    public void rename(String oldPath, String newPath) throws Exception {
+        new File(oldPath).renameTo(new File(newPath));
+    }
+
+    /**
+     * 创建文件夹
+     * @param directoryPath
+     * @return
+     */
+    private boolean mkDirSingleHierarchy(String directoryPath) {
+        File file=new File(directoryPath.toString());
+        // 如果directoryPath目录不存在,则创建
+        if(!file.exists()) {
+            return file.mkdir();//创建文件夹
+        }
+        return true;
     }
 }

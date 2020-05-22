@@ -24,6 +24,7 @@ import com.flink.flink.api.java.MyLocalStreamEnvironment;
 import com.flink.flinkx.config.DataTransferConfig;
 import com.flink.flinkx.config.SpeedConfig;
 import com.flink.flinkx.constants.ConfigConstant;
+import com.flink.flinkx.file.reader.FileReader;
 import com.flink.flinkx.mysql.reader.MysqlReader;
 import com.flink.flinkx.mysql.writer.MysqlWriter;
 import com.flink.flinkx.mysqld.reader.MysqldReader;
@@ -81,7 +82,8 @@ public class LocalTest {
 //        conf.setString("metrics.reporter.promgateway.randomJobNameSuffix","true");
 //        conf.setString("metrics.reporter.promgateway.deleteOnShutdown","false");
 
-        String jobPath = "D:\\dtstack\\flinkx-all\\flinkx-examples\\examples\\clickhouse_stream.json";
+//        String jobPath = "D:\\dtstack\\flinkx-all\\flinkx-examples\\examples\\clickhouse_stream.json";
+        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/file_stream.json";
         String savePointPath = "";
         JobExecutionResult result = LocalTest.runJob(new File(jobPath), confProperties, savePointPath);
         ResultPrintUtil.printResult(result);
@@ -146,9 +148,9 @@ public class LocalTest {
             case PluginNameConstants.MYSQL_READER:
                 reader = new MysqlReader(config, env);
                 break;
-//            case PluginNameConstants.FILE_READER:
-//                reader = new CarbondataReader(config, env);
-//                break;
+            case PluginNameConstants.FILE_READER:
+                reader = new FileReader(config, env);
+                break;
             default:
                 throw new IllegalArgumentException("Can not find reader by name:" + readerName);
         }

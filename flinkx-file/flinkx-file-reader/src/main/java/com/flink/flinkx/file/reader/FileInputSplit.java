@@ -11,7 +11,7 @@ import java.util.List;
  * author: gerry
  * created: 2020-05-22 12:05
  **/
-public class FtpInputSplit  implements InputSplit {
+public class FileInputSplit implements InputSplit {
     private List<String> paths = new ArrayList<>();
 
     @Override

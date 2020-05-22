@@ -1,6 +1,7 @@
 package com.flink.flinkx.file;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -56,4 +57,29 @@ public interface IFileHandler {
      * @param directoryPath 要创建的目录
      */
     void mkDirRecursive(String directoryPath);
+
+    /**
+     * 获取输出数据流
+     *
+     * @param filePath 文件路径
+     * @return 数据流
+     */
+    OutputStream getOutputStream(String filePath);
+
+    /**
+     * 删除目录下的文件
+     *
+     * @param dir 指定的目录
+     * @param exclude 要排除的文件
+     */
+    void deleteAllFilesInDir(String dir, List<String> exclude);
+
+    /**
+     * 重命名路径
+     *
+     * @param oldPath 原来的路径名称
+     * @param newPath 新的路径名称
+     * @throws Exception 可能会出现文件不存在，连接异常等
+     */
+    void rename(String oldPath, String newPath) throws Exception;
 }
