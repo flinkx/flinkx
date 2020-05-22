@@ -17,6 +17,10 @@ public class FileConfig implements Serializable {
 
     public String encoding = "UTF-8";
 
+    public String fieldDelimiter = FileConfigConstants.DEFAULT_FIELD_DELIMITER;
+
+    public boolean isFirstLineHeader = false;
+
     public String getPath() {
         return path;
     }
@@ -31,5 +35,21 @@ public class FileConfig implements Serializable {
 
     public void setEncoding(String encoding) {
         this.encoding = encoding;
+    }
+
+    public String getFieldDelimiter() {
+        return fieldDelimiter;
+    }
+
+    public void setFieldDelimiter(String fieldDelimiter) {
+        this.fieldDelimiter = fieldDelimiter;
+    }
+
+    public boolean getIsFirstLineHeader() {
+        return isFirstLineHeader;
+    }
+
+    public void setIsFirstLineHeader(boolean isFirstLineHeader) {
+        isFirstLineHeader = isFirstLineHeader;
     }
 }

@@ -1,14 +1,18 @@
 package com.flink.flinkx.file.reader;
 
+import com.flink.flinkx.constants.ConstantValue;
 import com.flink.flinkx.file.FileConfig;
 import com.flink.flinkx.file.FileHandler;
 import com.flink.flinkx.file.IFileHandler;
 import com.flink.flinkx.inputformat.BaseRichInputFormat;
 import com.flink.flinkx.reader.MetaColumn;
+import com.flink.flinkx.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.core.io.InputSplit;
 import org.apache.flink.types.Row;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,19 +39,82 @@ public class FileInputFormat extends BaseRichInputFormat{
     private transient String line;
 
     @Override
-    protected void openInternal(InputSplit inputSplit) throws IOException {
+    public void openInputFormat() throws IOException {
         super.openInputFormat();
         fileHandler = new FileHandler();
     }
 
+
     @Override
-    protected InputSplit[] createInputSplitsInternal(int i) throws Exception {
-        return new InputSplit[0];
+    protected InputSplit[] createInputSplitsInternal(int minNumSplits) throws Exception {
+        List<String> files = new ArrayList<>();
+        String path = fileConfig.getPath();
+        if(path != null && path.length() > 0){
+            path = path.replace("\n","").replace("\r","");
+            String[] pathArray = StringUtils.split(path, ",");
+            for (String p : pathArray) {
+                files.addAll(fileHandler.getFiles(p.trim()));
+            }
+        }
+        int numSplits = (Math.min(files.size(), minNumSplits));
+        FtpInputSplit[] ftpInputSplits = new FtpInputSplit[numSplits];
+        for(int index = 0; index < numSplits; ++index) {
+            ftpInputSplits[index] = new FtpInputSplit();
+        }
+        for(int i = 0; i < files.size(); ++i) {
+            ftpInputSplits[i % numSplits].getPaths().add(files.get(i));
+        }
+
+        return ftpInputSplits;
+    }
+
+    @Override
+    protected void openInternal(InputSplit split) throws IOException {
+        FtpInputSplit inputSplit = (FtpInputSplit)split;
+        List<String> paths = inputSplit.getPaths();
+
+        if (fileConfig.getIsFirstLineHeader()){
+            br = new FileSeqBufferedReader(fileHandler,paths.iterator());
+            br.setFromLine(1);
+        } else {
+            br = new FileSeqBufferedReader(fileHandler,paths.iterator());
+            br.setFromLine(0);
+        }
+        br.setCharsetName(charsetName);
     }
 
     @Override
     protected Row nextRecordInternal(Row row) throws IOException {
-        return null;
+        String[] fields = line.split(fileConfig.getFieldDelimiter());
+        if (metaColumns.size() == 1 && ConstantValue.STAR_SYMBOL.equals(metaColumns.get(0).getName())){
+            row = new Row(fields.length);
+            for (int i = 0; i < fields.length; i++) {
+                row.setField(i, fields[i]);
+            }
+        }else {
+            row = new Row(metaColumns.size());
+            for (int i = 0; i < metaColumns.size(); i++) {
+                MetaColumn metaColumn = metaColumns.get(i);
+
+                Object value = null;
+                if(metaColumn.getIndex() != null && metaColumn.getIndex() < fields.length){
+                    value = fields[metaColumn.getIndex()];
+                    if(((String) value).length() == 0){
+                        value = metaColumn.getValue();
+                    }
+                } else if(metaColumn.getValue() != null){
+                    value = metaColumn.getValue();
+                }
+
+                if(value != null){
+                    value = StringUtil.string2col(String.valueOf(value),metaColumn.getType(),metaColumn.getTimeFormat());
+                }
+
+                row.setField(i, value);
+            }
+        }
+
+        return row;
     }
 
     @Override
