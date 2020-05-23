@@ -16,6 +16,8 @@
         <module>flinkx-file</module>
         <module>flinkx-test</module>
         <module>flinkx-binlog</module>
+        <module>flinkx-kafka</module>
+        <module>flinkx-kb</module>
     </modules>
 
     <properties>
