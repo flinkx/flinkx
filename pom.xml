@@ -15,6 +15,7 @@
         <module>flinkx-stream</module>
         <module>flinkx-file</module>
         <module>flinkx-test</module>
+        <module>flinkx-binlog</module>
     </modules>
 
     <properties>
