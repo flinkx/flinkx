@@ -21,11 +21,14 @@ package com.flink.flinkx.test;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.flink.flink.api.java.MyLocalStreamEnvironment;
+import com.flink.flinkx.binlog.reader.BinlogReader;
 import com.flink.flinkx.config.DataTransferConfig;
 import com.flink.flinkx.config.SpeedConfig;
 import com.flink.flinkx.constants.ConfigConstant;
 import com.flink.flinkx.file.reader.FileReader;
 import com.flink.flinkx.file.writer.FileWriter;
+import com.flink.flinkx.kafka.reader.KafkaReader;
+import com.flink.flinkx.kafka.writer.KafkaWriter;
 import com.flink.flinkx.mysql.reader.MysqlReader;
 import com.flink.flinkx.mysql.writer.MysqlWriter;
 import com.flink.flinkx.mysqld.reader.MysqldReader;
@@ -84,7 +87,10 @@ public class LocalTest {
 //        conf.setString("metrics.reporter.promgateway.deleteOnShutdown","false");
 
 //        String jobPath = "D:\\dtstack\\flinkx-all\\flinkx-examples\\examples\\clickhouse_stream.json";
-        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/file_stream.json";
+//        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/file_stream.json";
+//        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/mysql1.json";
+//        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/mysql2.json";
+        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/binlog1.json";
         String savePointPath = "";
         JobExecutionResult result = LocalTest.runJob(new File(jobPath), confProperties, savePointPath);
         ResultPrintUtil.printResult(result);
@@ -152,6 +158,12 @@ public class LocalTest {
             case PluginNameConstants.FILE_READER:
                 reader = new FileReader(config, env);
                 break;
+            case PluginNameConstants.BINLOG_READER:
+                reader = new BinlogReader(config, env);
+                break;
+            case PluginNameConstants.KAFKA_READER:
+                reader = new KafkaReader(config, env);
+                break;
             default:
                 throw new IllegalArgumentException("Can not find reader by name:" + readerName);
         }
@@ -171,6 +183,9 @@ public class LocalTest {
                 break;
             case PluginNameConstants.FILE_WRITER:
                 writer = new FileWriter(config);
+                break;
+            case PluginNameConstants.KAFKA_WRITER:
+                writer = new KafkaWriter(config);
                 break;
             default:
                 throw new IllegalArgumentException("Can not find writer by name:" + writerName);
