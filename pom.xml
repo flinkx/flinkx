@@ -18,6 +18,7 @@
         <module>flinkx-binlog</module>
         <module>flinkx-kafka</module>
         <module>flinkx-kb</module>
+        <module>flinkx-launcher</module>
     </modules>
 
     <properties>

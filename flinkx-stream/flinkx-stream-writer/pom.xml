@@ -64,13 +64,13 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy todir="${basedir}/../../plugins/streamreader">
+                                <copy todir="${basedir}/../../plugins/streamwriter">
                                     <fileset dir="target/">
                                         <include name="${project.name}-${project.version}.jar" />
                                     </fileset>
                                 </copy>
-                                <move file="${basedir}/../../plugins/streamreader/${project.name}-${project.version}.jar"
-                                      tofile="${basedir}/../../plugins/streamreader/${project.name}-${package.name}.jar" />
+                                <move file="${basedir}/../../plugins/streamwriter/${project.name}-${project.version}.jar"
+                                      tofile="${basedir}/../../plugins/streamwriter/${project.name}-${package.name}.jar" />
                             </tasks>
                         </configuration>
                     </execution>

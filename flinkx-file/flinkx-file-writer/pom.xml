@@ -53,11 +53,11 @@
                             <relocations>
                                 <relocation>
                                     <pattern>io.netty</pattern>
-                                    <shadedPattern>shade.mysqlwriter.io.netty</shadedPattern>
+                                    <shadedPattern>shade.filewriter.io.netty</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.google</pattern>
-                                    <shadedPattern>shade.mysqlwriter.com.google</shadedPattern>
+                                    <shadedPattern>shade.filewriter.com.google</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -78,13 +78,13 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy todir="${basedir}/../../plugins/mysqlwriter">
+                                <copy todir="${basedir}/../../plugins/filewriter">
                                     <fileset dir="target/">
                                         <include name="${project.name}-${project.version}.jar" />
                                     </fileset>
                                 </copy>
-                                <move file="${basedir}/../../plugins/mysqlwriter/${project.name}-${project.version}.jar"
-                                      tofile="${basedir}/../../plugins/mysqlwriter/${project.name}-${package.name}.jar" />
+                                <move file="${basedir}/../../plugins/filewriter/${project.name}-${project.version}.jar"
+                                      tofile="${basedir}/../../plugins/filewriter/${project.name}-${package.name}.jar" />
                             </tasks>
                         </configuration>
                     </execution>
