@@ -28,14 +28,29 @@ public class FileInputFormat extends BaseRichInputFormat{
      */
     protected FileConfig fileConfig;
 
+    /**
+     * 字符集
+     */
     protected String charsetName = "utf-8";
 
+    /**
+     * json定义column数据格式
+     */
     protected List<MetaColumn> metaColumns;
 
+    /**
+     * 文件流读取
+     */
     private transient FileSeqBufferedReader br;
 
+    /**
+     * 文件操作
+     */
     private transient IFileHandler fileHandler;
 
+    /**
+     * 读取行数
+     */
     private transient String line;
 
     @Override

@@ -293,7 +293,7 @@ public abstract class BaseFileOutputFormat extends BaseRichOutputFormat {
                     //正常被close，触发 .data 目录下的文件移动到数据目录
                     moveAllTemporaryDataFileToDirectory();
 
-                    LOG.info("The task ran successfully,clear temporary data files");
+                    LOG.info("The task run successfully,clear temporary data files");
                     clearTemporaryDataFiles();
                 }
             }

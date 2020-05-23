@@ -13,13 +13,35 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FileConfig implements Serializable {
 
+    /**
+     * 文件路径
+     */
     public String path;
 
+    /**
+     * 字符集
+     */
     public String encoding = "UTF-8";
 
+    /**
+     * 默认分割符号
+     */
     public String fieldDelimiter = FileConfigConstants.DEFAULT_FIELD_DELIMITER;
 
+    /**
+     * 第一行是否是头部
+     */
     public boolean isFirstLineHeader = false;
+
+    /**
+     * 写入模式 append 、overwrite
+     */
+    public String writeMode;
+
+    /**
+     * 写入文件最大值
+     */
+    public long maxFileSize = 1024 * 1024 * 1024;
 
     public String getPath() {
         return path;
@@ -51,5 +73,21 @@ public class FileConfig implements Serializable {
 
     public void setIsFirstLineHeader(boolean isFirstLineHeader) {
         isFirstLineHeader = isFirstLineHeader;
+    }
+
+    public String getWriteMode() {
+        return writeMode;
+    }
+
+    public void setWriteMode(String writeMode) {
+        this.writeMode = writeMode;
+    }
+
+    public long getMaxFileSize() {
+        return maxFileSize;
+    }
+
+    public void setMaxFileSize(long maxFileSize) {
+        this.maxFileSize = maxFileSize;
     }
 }

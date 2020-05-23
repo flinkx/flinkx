@@ -8,5 +8,8 @@ package com.flink.flinkx.file;
  **/
 public class FileConfigConstants {
 
-    public static final String DEFAULT_FIELD_DELIMITER = ",";
+    /**
+     * 多个字段分割符
+     */
+    public static final String DEFAULT_FIELD_DELIMITER = ":";
 }

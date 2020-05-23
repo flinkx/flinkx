@@ -25,6 +25,7 @@ import com.flink.flinkx.config.DataTransferConfig;
 import com.flink.flinkx.config.SpeedConfig;
 import com.flink.flinkx.constants.ConfigConstant;
 import com.flink.flinkx.file.reader.FileReader;
+import com.flink.flinkx.file.writer.FileWriter;
 import com.flink.flinkx.mysql.reader.MysqlReader;
 import com.flink.flinkx.mysql.writer.MysqlWriter;
 import com.flink.flinkx.mysqld.reader.MysqldReader;
@@ -168,9 +169,9 @@ public class LocalTest {
             case PluginNameConstants.MYSQL_WRITER:
                 writer = new MysqlWriter(config);
                 break;
-//            case PluginNameConstants.FILE_WRITER:
-//                writer = new CarbondataWriter(config);
-//                break;
+            case PluginNameConstants.FILE_WRITER:
+                writer = new FileWriter(config);
+                break;
             default:
                 throw new IllegalArgumentException("Can not find writer by name:" + writerName);
         }

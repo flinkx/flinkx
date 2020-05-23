@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * program: flinkx-all->IFileHandler
- * description:
+ * description: 文件操作
  * author: gerry
  * created: 2020-05-22 09:26
  **/
