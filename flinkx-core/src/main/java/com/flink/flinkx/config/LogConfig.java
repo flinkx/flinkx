@@ -34,7 +34,7 @@ public class LogConfig extends AbstractConfig {
 
     public static final boolean DEFAULT_ISLOGGER = false;
     public static final String DEFAULT_LEVEL = "info";
-    public static final String DEFAULT_PATH = "/tmp/flink/flinkx/";
+    public static final String DEFAULT_PATH = "/tmp/dtstack/flinkx/";
     public static final String DEFAULT_LOG4J_PATTERN = "%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n";
     public static final String DEFAULT_LOGBACK_PATTERN = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{60} %X{sourceThread} - %msg%n";
 

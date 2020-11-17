@@ -48,6 +48,7 @@ public class FileReader extends BaseDataReader {
     @Override
     public DataStream<Row> readData() {
         FileInputFormatBuilder builder = new FileInputFormatBuilder();
+        builder.setDataTransferConfig(dataTransferConfig);
         builder.setFileConfig(fileConfig);
         builder.setMetaColumn(metaColumns);
         builder.setTestConfig(testConfig);

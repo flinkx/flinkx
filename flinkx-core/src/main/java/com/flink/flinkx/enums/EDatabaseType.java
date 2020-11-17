@@ -33,6 +33,7 @@ public enum EDatabaseType {
     SQLServer,
     Oracle,
     PostgreSQL,
+    Greenplum,
     DB2,
     MongoDB,
     Redis,
@@ -52,5 +53,5 @@ public enum EDatabaseType {
     clickhouse,
     polarDB,
     Phoenix,
-    dm
+    dm,
 }

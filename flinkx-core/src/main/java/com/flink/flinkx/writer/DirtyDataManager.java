@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.flink.flinkx.writer.WriteErrorTypes.*;
 import static com.flink.flinkx.writer.WriteErrorTypes.ERR_FORMAT_TRANSFORM;
 import static com.flink.flinkx.writer.WriteErrorTypes.ERR_NULL_POINTER;
 import static com.flink.flinkx.writer.WriteErrorTypes.ERR_PRIMARY_CONFLICT;

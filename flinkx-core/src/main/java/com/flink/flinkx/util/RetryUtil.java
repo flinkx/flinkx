@@ -34,7 +34,7 @@ public final class RetryUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(RetryUtil.class);
 
-    private static final long MAX_SLEEP_MILLISECOND = 256 * 1000;
+    private static final long MAX_SLEEP_MILLISECOND = 256 * 1000L;
 
     /**
      * 重试次数工具方法.
@@ -75,7 +75,7 @@ public final class RetryUtil {
                 } catch (Exception e) {
                     saveException = e;
                     if (i == 0) {
-                        LOG.error(String.format("Exception when calling callable, 异常Msg:%s", saveException.getMessage()), saveException);
+                        LOG.error(String.format("Exception when calling callable, 异常Msg:%s", ExceptionUtil.getErrorMessage(saveException)), saveException);
                     }
 
                     if (null != retryExceptionClasss && !retryExceptionClasss.isEmpty()) {

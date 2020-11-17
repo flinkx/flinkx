@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.Properties;
@@ -137,21 +136,11 @@ public class SftpHandler {
             throw new RuntimeException("File not exist on sftp:" + ftpPath);
         }
 
-        OutputStream os = null;
-        try {
-            os = new FileOutputStream(new File(localPath));
+        try (OutputStream os = new FileOutputStream(new File(localPath))){
             channelSftp.get(ftpPath, os);
+            os.flush();
         } catch (Exception e){
             throw new RuntimeException("download file from sftp error", e);
-        } finally {
-            if(os != null){
-                try {
-                    os.flush();
-                    os.close();
-                } catch (IOException e) {
-                    LOG.warn("", e);
-                }
-            }
         }
     }
 

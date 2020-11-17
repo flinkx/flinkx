@@ -25,6 +25,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.security.authentication.util.KerberosName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.security.krb5.Config;
@@ -33,6 +34,7 @@ import sun.security.krb5.internal.ktab.KeyTabEntry;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
@@ -46,6 +48,7 @@ public class KerberosUtil {
     private static final String SP = "/";
 
     private static final String KEY_SFTP_CONF = "sftpConf";
+    private static final String KEY_PRINCIPAL = "principal";
     private static final String KEY_REMOTE_DIR = "remoteDir";
     private static final String KEY_USE_LOCAL_FILE = "useLocalFile";
     public static final String KEY_PRINCIPAL_FILE = "principalFile";
@@ -89,6 +92,15 @@ public class KerberosUtil {
         return UserGroupInformation.loginUserFromKeytabAndReturnUGI(principal, keytab);
     }
 
+    public static String getPrincipal(Map<String, Object> configMap, String keytabPath) {
+        String principal = MapUtils.getString(configMap, KEY_PRINCIPAL);
+        if (StringUtils.isEmpty(principal)) {
+            principal = findPrincipalFromKeytab(keytabPath);
+        }
+
+        return principal;
+    }
+
     private static void reloadKrb5Conf(Configuration conf){
         String krb5File = conf.get(KEY_JAVA_SECURITY_KRB5_CONF);
         LOG.info("set krb5 file:{}", krb5File);
@@ -112,6 +124,7 @@ public class KerberosUtil {
 
         krb5FilePath = loadFile(kerberosConfig, krb5FilePath);
         kerberosConfig.put(KEY_JAVA_SECURITY_KRB5_CONF, krb5FilePath);
+        System.setProperty(KEY_JAVA_SECURITY_KRB5_CONF, krb5FilePath);
     }
 
     /**
@@ -164,31 +177,31 @@ public class KerberosUtil {
         String localDir = LOCAL_CACHE_DIR + SP + localDirName;
         localDir = createDir(localDir);
         String fileLocalPath = localDir + SP + fileName;
+        // 更新sftp文件对应的local文件
         if (fileExists(fileLocalPath)) {
-            return fileLocalPath;
-        } else {
-            SftpHandler handler = null;
-            try {
-                handler = SftpHandler.getInstanceWithRetry(MapUtils.getMap(config, KEY_SFTP_CONF));
-                if(handler.isFileExist(filePathOnSftp)){
-                    handler.downloadFileWithRetry(filePathOnSftp, fileLocalPath);
-
-                    LOG.info("download file:{} to local:{}", filePathOnSftp, fileLocalPath);
-                    return fileLocalPath;
-                }
-            } catch (Exception e){
-                throw new RuntimeException(e);
-            } finally {
-                if (handler != null){
-                    handler.close();
-                }
-            }
-
-            throw new RuntimeException("File[" + filePathOnSftp + "] not exist on sftp");
+            delectFile(fileLocalPath);
         }
+        SftpHandler handler = null;
+        try {
+            handler = SftpHandler.getInstanceWithRetry(MapUtils.getMap(config, KEY_SFTP_CONF));
+            if(handler.isFileExist(filePathOnSftp)){
+                handler.downloadFileWithRetry(filePathOnSftp, fileLocalPath);
+
+                LOG.info("download file:{} to local:{}", filePathOnSftp, fileLocalPath);
+                return fileLocalPath;
+            }
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        } finally {
+            if (handler != null){
+                handler.close();
+            }
+        }
+
+        throw new RuntimeException("File[" + filePathOnSftp + "] not exist on sftp");
     }
 
-    public static String findPrincipalFromKeytab(String keytabFile) {
+    private static String findPrincipalFromKeytab(String keytabFile) {
         KeyTab keyTab = KeyTab.getInstance(keytabFile);
         for (KeyTabEntry entry : keyTab.getEntries()) {
             String principal = entry.getService().getName();
@@ -198,6 +211,17 @@ public class KerberosUtil {
         }
 
         return null;
+    }
+
+    private static void delectFile(String filePath){
+        if (fileExists(filePath)) {
+            File file = new File(filePath);
+            if(file.delete()){
+                LOG.info(file.getName() + " is delected！");
+            }else{
+                LOG.error("delected " + file.getName() + " failed！");
+            }
+        }
     }
 
     private static boolean fileExists(String filePath) {
@@ -226,15 +250,23 @@ public class KerberosUtil {
             throw new RuntimeException("[principalFile]必须指定");
         }
 
-        boolean useLocalFile = MapUtils.getBooleanValue(config, KEY_USE_LOCAL_FILE);
-        if (useLocalFile) {
-            return fileName;
-        }
-
-        if (fileName.contains(SP)) {
-            fileName = fileName.substring(fileName.lastIndexOf(SP) + 1);
-        }
-
         return fileName;
+    }
+
+    /**
+     * 刷新krb内容信息
+     */
+    public static void refreshConfig() {
+        try{
+            Config.refresh();
+            Field defaultRealmField = KerberosName.class.getDeclaredField("defaultRealm");
+            defaultRealmField.setAccessible(true);
+            defaultRealmField.set(null, org.apache.hadoop.security.authentication.util.KerberosUtil.getDefaultRealm());
+            //reload java.security.auth.login.config
+            javax.security.auth.login.Configuration.setConfiguration(null);
+        }catch (Exception e){
+            LOG.warn("resetting default realm failed, current default realm will still be used.", e);
+        }
+
     }
 }

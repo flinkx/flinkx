@@ -293,18 +293,19 @@ public abstract class BaseFileOutputFormat extends BaseRichOutputFormat {
                     //正常被close，触发 .data 目录下的文件移动到数据目录
                     moveAllTemporaryDataFileToDirectory();
 
-                    LOG.info("The task run successfully,clear temporary data files");
+                    LOG.info("The task ran successfully,clear temporary data files");
+                    closeSource();
                     clearTemporaryDataFiles();
                 }
+            }else{
+                closeSource();
             }
-
-            closeSource();
         } catch(Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    protected boolean isTaskEndsNormally() throws IOException{
+    protected boolean isTaskEndsNormally() throws IOException {
         String state = getTaskState();
         LOG.info("State of current task is:[{}]", state);
         if(!RUNNING_STATE.equals(state)){
@@ -329,11 +330,6 @@ public abstract class BaseFileOutputFormat extends BaseRichOutputFormat {
     }
 
     @Override
-    protected void writeMultipleRecordsInternal() throws Exception {
-        // CAN NOT HAPPEN
-    }
-
-    @Override
     protected boolean needWaitAfterCloseInternal() {
         return true;
     }
@@ -342,7 +338,7 @@ public abstract class BaseFileOutputFormat extends BaseRichOutputFormat {
         return path;
     }
 
-    public void flushData() throws IOException{
+    public void flushData() throws IOException {
         if (rowsOfCurrentBlock != 0) {
             flushDataInternal();
             if (restoreConfig.isRestore()) {

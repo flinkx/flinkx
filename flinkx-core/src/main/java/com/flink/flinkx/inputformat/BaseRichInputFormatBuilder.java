@@ -18,6 +18,7 @@
 
 package com.flink.flinkx.inputformat;
 
+import com.flink.flinkx.config.DataTransferConfig;
 import com.flink.flinkx.config.LogConfig;
 import com.flink.flinkx.config.RestoreConfig;
 import com.flink.flinkx.config.TestConfig;
@@ -56,6 +57,9 @@ public abstract class BaseRichInputFormatBuilder {
         format.testConfig = testConfig;
     }
 
+    public void setDataTransferConfig(DataTransferConfig dataTransferConfig){
+        format.setDataTransferConfig(dataTransferConfig);
+    }
     /**
      * Check the value of parameters
      */

@@ -75,11 +75,11 @@ public class MetricLatch extends BaseLatch {
     private int getIntMetricVal(String requestUrl) {
         try(InputStream inputStream = UrlUtil.open(requestUrl)) {
             try(Reader rd = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
-                Map<String,Object> map = gson.fromJson(rd, Map.class);
+                Map<String, Object> map = gson.fromJson(rd, Map.class);
                 List<LinkedTreeMap> userTaskAccumulators = (List<LinkedTreeMap>) map.get("user-task-accumulators");
                 for(LinkedTreeMap accumulator : userTaskAccumulators) {
                     if(metricName != null && metricName.equals(accumulator.get("name"))) {
-                        return Integer.valueOf((String )accumulator.get("value"));
+                        return Integer.valueOf((String)accumulator.get("value"));
                     }
                 }
             } catch (Exception e) {

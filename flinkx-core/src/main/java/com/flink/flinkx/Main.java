@@ -15,12 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.flink.flinkx;
 
 import com.flink.flink.api.java.MyLocalStreamEnvironment;
 import com.flink.flinkx.classloader.ClassLoaderManager;
-import com.flink.flinkx.config.*;
+import com.flink.flinkx.config.ContentConfig;
+import com.flink.flinkx.config.DataTransferConfig;
+import com.flink.flinkx.config.RestartConfig;
+import com.flink.flinkx.config.SpeedConfig;
+import com.flink.flinkx.config.TestConfig;
 import com.flink.flinkx.constants.ConfigConstant;
 import com.flink.flinkx.options.OptionParser;
 import com.flink.flinkx.reader.BaseDataReader;
@@ -30,11 +33,10 @@ import com.flink.flinkx.writer.BaseDataWriter;
 import com.flink.flinkx.writer.DataWriterFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.time.Time;
-import org.apache.flink.client.program.ContextEnvironment;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.configuration.GlobalConfiguration;
 import org.apache.flink.runtime.jobgraph.SavepointRestoreSettings;
@@ -43,17 +45,14 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSink;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
-import org.apache.flink.streaming.api.environment.StreamContextEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.types.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -67,7 +66,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Main {
 
-    public static Logger LOG = LoggerFactory.getLogger(Main.class);
+    public static Logger LOG = LoggerFactory.getLogger(com.flink.flinkx.Main.class);
 
     public static final String READER = "reader";
     public static final String WRITER = "writer";
@@ -85,6 +84,7 @@ public class Main {
         String monitor = options.getMonitor();
         String pluginRoot = options.getPluginRoot();
         String savepointPath = options.getS();
+        String remotePluginPath = options.getRemotePluginPath();
         Properties confProperties = parseConf(options.getConfProp());
 
         // 解析jobPath指定的任务配置文件
@@ -104,6 +104,10 @@ public class Main {
             flinkConf = GlobalConfiguration.loadConfiguration(options.getFlinkconf());
         }
 
+        if (StringUtils.isNotEmpty(remotePluginPath)) {
+            config.setRemotePluginPath(remotePluginPath);
+        }
+
         StreamExecutionEnvironment env = (StringUtils.isNotBlank(monitor)) ?
                 StreamExecutionEnvironment.getExecutionEnvironment() :
                 new MyLocalStreamEnvironment(flinkConf);
@@ -115,6 +119,7 @@ public class Main {
 
         env.setParallelism(speedConfig.getChannel());
         env.setRestartStrategy(RestartStrategies.noRestart());
+
         BaseDataReader dataReader = DataReaderFactory.getDataReader(config, env);
         DataStream<Row> dataStream = dataReader.readData();
         if(speedConfig.getReaderChannel() > 0){
@@ -127,10 +132,10 @@ public class Main {
 
         BaseDataWriter dataWriter = DataWriterFactory.getDataWriter(config);
         DataStreamSink<?> dataStreamSink = dataWriter.writeData(dataStream);
+
         if(speedConfig.getWriterChannel() > 0){
             dataStreamSink.setParallelism(speedConfig.getWriterChannel());
         }
-
         if(env instanceof MyLocalStreamEnvironment) {
             if(StringUtils.isNotEmpty(savepointPath)){
                 ((MyLocalStreamEnvironment) env).setSettings(SavepointRestoreSettings.forPath(savepointPath));
@@ -198,6 +203,8 @@ public class Main {
         } else if (WRITER.equalsIgnoreCase(testConfig.getSpeedTest())){
             ContentConfig contentConfig = config.getJob().getContent().get(0);
             contentConfig.getReader().setName(STREAM_READER);
+        }else {
+            return;
         }
 
         config.getJob().getSetting().getSpeed().setBytes(-1);
@@ -213,21 +220,6 @@ public class Main {
 
         if(env instanceof MyLocalStreamEnvironment){
             ((MyLocalStreamEnvironment) env).setClasspaths(new ArrayList<>(classPathSet));
-        } else if(env instanceof StreamContextEnvironment){
-            Field field = env.getClass().getDeclaredField("ctx");
-            field.setAccessible(true);
-            ContextEnvironment contextEnvironment= (ContextEnvironment) field.get(env);
-
-            List<String> originUrlList = new ArrayList<>();
-            for (URL url : contextEnvironment.getClasspaths()) {
-                originUrlList.add(url.toString());
-            }
-
-            for (URL url : classPathSet) {
-                if (!originUrlList.contains(url.toString())){
-                    contextEnvironment.getClasspaths().add(url);
-                }
-            }
         }
     }
 

@@ -67,11 +67,11 @@ public class ReaderConfig extends AbstractConfig {
         public ParameterConfig(Map<String, Object> map) {
             super(map);
             column = (List) getVal(KEY_COLUMN_LIST);
-            List<Map<String,Object>> connList = (List<Map<String, Object>>) getVal(KEY_CONNECTION_CONFIG_LIST);
+            List<Map<String, Object>> connList = (List<Map<String, Object>>) getVal(KEY_CONNECTION_CONFIG_LIST);
             connection = new ArrayList<>();
             if(connList != null) {
-                for(Map<String,Object> conn : connList) {
-                    connection.add(new ParameterConfig.ConnectionConfig(conn));
+                for(Map<String, Object> conn : connList) {
+                    connection.add(new ConnectionConfig(conn));
                 }
             }
         }
@@ -95,6 +95,7 @@ public class ReaderConfig extends AbstractConfig {
         public class ConnectionConfig extends AbstractConfig {
 
             public static final String KEY_TABLE_LIST = "table";
+            public static final String KEY_SCHEMA = "schema";
             public static final String KEY_JDBC_URL_LIST = "jdbcUrl";
             public static final String KEY_JDBC_USERNAME = "username";
             public static final String KEY_JDBC_PASSWORD = "password";
@@ -109,6 +110,14 @@ public class ReaderConfig extends AbstractConfig {
 
             public void setTable(List<String> table) {
                 setVal(KEY_TABLE_LIST, table);
+            }
+
+            public String getSchema(){
+                return (String) getVal(KEY_SCHEMA);
+            }
+
+            public void setSchema(String schema){
+                setVal(KEY_SCHEMA, schema);
             }
 
             public List<String> getJdbcUrl() {

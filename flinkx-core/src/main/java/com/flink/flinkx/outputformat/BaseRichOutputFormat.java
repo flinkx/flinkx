@@ -34,7 +34,7 @@ import com.flink.flinkx.writer.DirtyDataManager;
 import com.flink.flinkx.writer.ErrorLimiter;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.accumulators.LongCounter;
 import org.apache.flink.api.common.io.CleanupWhenUnsuccessful;
 import org.apache.flink.configuration.Configuration;
@@ -51,7 +51,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.flink.flinkx.writer.WriteErrorTypes.*;
 import static com.flink.flinkx.writer.WriteErrorTypes.ERR_FORMAT_TRANSFORM;
 import static com.flink.flinkx.writer.WriteErrorTypes.ERR_NULL_POINTER;
 import static com.flink.flinkx.writer.WriteErrorTypes.ERR_PRIMARY_CONFLICT;
@@ -79,7 +78,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
     protected String dirtyPath;
 
     /** The hadoop config for dirty data storage */
-    protected Map<String,Object> dirtyHadoopConfig;
+    protected Map<String, Object> dirtyHadoopConfig;
 
     /** The source table field names  */
     protected List<String> srcFieldNames;
@@ -226,6 +225,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
             beforeOpenInternal();
             waitWhile("#1");
         }
+
 
         openInternal(taskNumber, numTasks);
         if(needWaitBeforeWriteRecords()) {
@@ -421,6 +421,10 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
      */
     protected abstract void writeMultipleRecordsInternal() throws Exception;
 
+    protected void notSupportBatchWrite(String writerName) {
+        throw new UnsupportedOperationException(writerName + "不支持批量写入");
+    }
+
     protected void writeRecordInternal() {
         try {
             writeMultipleRecords();
@@ -532,7 +536,7 @@ public abstract class BaseRichOutputFormat extends org.apache.flink.api.common.i
 
     }
 
-    protected String getTaskState() throws IOException{
+    protected String getTaskState() throws IOException {
         if (StringUtils.isEmpty(monitorUrl)) {
             return RUNNING_STATE;
         }

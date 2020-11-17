@@ -25,7 +25,7 @@ import com.flink.flinkx.util.UrlUtil;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.accumulators.LongCounter;
 import org.apache.flink.api.common.functions.RuntimeContext;
 import org.apache.flink.util.Preconditions;
@@ -217,7 +217,7 @@ public class AccumulatorCollector {
         for (String monitorUrl : monitorUrls) {
             try {
                 String response = UrlUtil.get(httpClient, monitorUrl);
-                Map<String,Object> map = gson.fromJson(response, Map.class);
+                Map<String, Object> map = gson.fromJson(response, Map.class);
                 List<LinkedTreeMap> userTaskAccumulators = (List<LinkedTreeMap>) map.get(KEY_ACCUMULATORS);
                 for(LinkedTreeMap accumulator : userTaskAccumulators) {
                     String name = (String) accumulator.get(KEY_NAME);
@@ -252,7 +252,7 @@ public class AccumulatorCollector {
         }
     }
 
-    class ValueAccumulator{
+    static class ValueAccumulator{
         private long global;
         private LongCounter local;
 

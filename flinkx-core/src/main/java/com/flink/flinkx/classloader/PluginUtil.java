@@ -24,7 +24,9 @@ import com.flink.flinkx.util.SysUtil;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,15 +43,28 @@ public class PluginUtil {
 
     private static final String PACKAGE_PREFIX = "com.flink.flinkx.";
 
-    public static Set<URL> getJarFileDirPath(String pluginName, String pluginRoot){
-        Set<URL> urlList = new HashSet<>();
+    private static final String JAR_PREFIX = "flinkx";
 
-        File commonDir = new File(pluginRoot + File.separator + COMMON_DIR + File.separator);
-        File pluginDir = new File(pluginRoot + File.separator + pluginName);
+    private static final String SP = File.separator;
+
+    public static Set<URL> getJarFileDirPath(String pluginName, String pluginRoot, String remotePluginPath) {
+        Set<URL> urlList = new HashSet<>();
+        List<File> pathDir = new ArrayList<>();
+
+        if (pluginRoot != null) {
+            pathDir.add(new File(pluginRoot + File.separator + pluginName));
+            pathDir.add(new File(pluginRoot + File.separator + COMMON_DIR + File.separator));
+        }
+
+        if (remotePluginPath != null) {
+            pathDir.add(new File(remotePluginPath + File.separator + pluginName));
+            pathDir.add(new File(remotePluginPath + File.separator + COMMON_DIR + File.separator));
+        }
 
         try {
-            urlList.addAll(SysUtil.findJarsInDir(commonDir));
-            urlList.addAll(SysUtil.findJarsInDir(pluginDir));
+            for(File path : pathDir) {
+                urlList.addAll(SysUtil.findJarsInDir(path));
+            }
 
             return urlList;
         } catch (MalformedURLException e) {
@@ -57,11 +72,11 @@ public class PluginUtil {
         }
     }
 
-    public static String getPluginClassName(String pluginName){
+    public static String getPluginClassName(String pluginName) {
         String pluginClassName;
-        if(pluginName.toLowerCase().endsWith(READER_SUFFIX)) {
+        if (pluginName.toLowerCase().endsWith(READER_SUFFIX)) {
             pluginClassName = PACKAGE_PREFIX + camelize(pluginName, READER_SUFFIX);
-        } else if(pluginName.toLowerCase().endsWith(WRITER_SUFFIX)) {
+        } else if (pluginName.toLowerCase().endsWith(WRITER_SUFFIX)) {
             pluginClassName = PACKAGE_PREFIX + camelize(pluginName, WRITER_SUFFIX);
         } else {
             throw new IllegalArgumentException("Plugin Name should end with reader, writer or database");
@@ -77,8 +92,8 @@ public class PluginUtil {
         suffix = suffix.toLowerCase();
         StringBuffer sb = new StringBuffer();
         sb.append(left + "." + suffix + ".");
-        sb.append(left.substring(0,1).toUpperCase() + left.substring(1));
-        sb.append(suffix.substring(0,1).toUpperCase() + suffix.substring(1));
+        sb.append(left.substring(0, 1).toUpperCase() + left.substring(1));
+        sb.append(suffix.substring(0, 1).toUpperCase() + suffix.substring(1));
         return sb.toString();
     }
 }

@@ -159,7 +159,7 @@ public class FileOutputFormat extends BaseFileOutputFormat {
             nextBlock();
         }
 
-        String line = StringUtil.row2string(row, columnTypes, fileConfig.getFieldDelimiter(), columnNames);
+        String line = StringUtil.row2string(row, columnTypes, fileConfig.getFieldDelimiter());
         try {
             byte[] bytes = line.getBytes(fileConfig.getEncoding());
             this.os.write(bytes);
@@ -317,5 +317,10 @@ public class FileOutputFormat extends BaseFileOutputFormat {
     @Override
     protected String getExtension() {
         return ".csv";
+    }
+
+    @Override
+    protected void writeMultipleRecordsInternal() throws Exception {
+        notSupportBatchWrite("FileWriter");
     }
 }

@@ -87,10 +87,10 @@ public class LocalTest {
 //        conf.setString("metrics.reporter.promgateway.deleteOnShutdown","false");
 
 //        String jobPath = "D:\\dtstack\\flinkx-all\\flinkx-examples\\examples\\clickhouse_stream.json";
-//        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/file_stream.json";
+        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/file_stream.json";
 //        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/mysql1.json";
 //        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/mysql2.json";
-        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/binlog1.json";
+//        String jobPath = "/Users/gerry/Desktop/www/java/flink/flinkx/jobs/binlog1.json";
         String savePointPath = "";
         JobExecutionResult result = LocalTest.runJob(new File(jobPath), confProperties, savePointPath);
         ResultPrintUtil.printResult(result);

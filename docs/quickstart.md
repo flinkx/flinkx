@@ -18,7 +18,7 @@ cd flink-1.8.5
 ## 编译插件
 
 ```bash
-mvn clean package -DskipTests
+mvn clean package -Dmaven.test.skip=true
 ```
 
 ## 运行任务

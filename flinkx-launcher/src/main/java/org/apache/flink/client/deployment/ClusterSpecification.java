@@ -18,7 +18,6 @@
 
 package org.apache.flink.client.deployment;
 
-import com.flink.flinkx.launcher.ClassLoaderType;
 import org.apache.flink.client.program.PackagedProgram;
 import org.apache.flink.configuration.ConfigConstants;
 import org.apache.flink.configuration.Configuration;
@@ -46,14 +45,13 @@ public final class ClusterSpecification {
     private Configuration configuration;
     private YarnConfiguration yarnConfiguration;
     private JobGraph jobGraph;
-    private SavepointRestoreSettings spSetting;
+    private SavepointRestoreSettings spSetting = SavepointRestoreSettings.none();
     private List<URL> classpaths;
     private String entryPointClass;
     private String[] programArgs;
     private File jarFile;
     private boolean createProgramDelay = false;
     private PackagedProgram program;
-    private ClassLoaderType classLoaderType = ClassLoaderType.PARENT_FIRST;
 
     private ClusterSpecification(int masterMemoryMB, int taskManagerMemoryMB, int numberTaskManagers, int slotsPerTaskManager, int parallelism, int priority) {
         this.masterMemoryMB = masterMemoryMB;
@@ -62,6 +60,20 @@ public final class ClusterSpecification {
         this.slotsPerTaskManager = slotsPerTaskManager;
         this.parallelism = parallelism;
         this.priority = priority;
+    }
+
+    public static ClusterSpecification fromConfiguration(Configuration configuration) {
+        int slots = configuration.getInteger(ConfigConstants.TASK_MANAGER_NUM_TASK_SLOTS, 1);
+
+        int jobManagerMemoryMb = configuration.getInteger(JobManagerOptions.JOB_MANAGER_HEAP_MEMORY_MB);
+        int taskManagerMemoryMb = configuration.getInteger(TaskManagerOptions.TASK_MANAGER_HEAP_MEMORY_MB);
+
+        return new ClusterSpecificationBuilder()
+                .setMasterMemoryMB(jobManagerMemoryMb)
+                .setTaskManagerMemoryMB(taskManagerMemoryMb)
+                .setNumberTaskManagers(1)
+                .setSlotsPerTaskManager(slots)
+                .createClusterSpecification();
     }
 
     public PackagedProgram getProgram() {
@@ -172,14 +184,6 @@ public final class ClusterSpecification {
         this.createProgramDelay = createProgramDelay;
     }
 
-    public ClassLoaderType getClassLoaderType() {
-        return classLoaderType;
-    }
-
-    public void setClassLoaderType(ClassLoaderType classLoaderType) {
-        this.classLoaderType = classLoaderType;
-    }
-
     @Override
     public String toString() {
         return "ClusterSpecification{" +
@@ -189,20 +193,6 @@ public final class ClusterSpecification {
                 ", slotsPerTaskManager=" + slotsPerTaskManager +
                 ", priority=" + priority +
                 '}';
-    }
-
-    public static ClusterSpecification fromConfiguration(Configuration configuration) {
-        int slots = configuration.getInteger(ConfigConstants.TASK_MANAGER_NUM_TASK_SLOTS, 1);
-
-        int jobManagerMemoryMb = configuration.getInteger(JobManagerOptions.JOB_MANAGER_HEAP_MEMORY_MB);
-        int taskManagerMemoryMb = configuration.getInteger(TaskManagerOptions.TASK_MANAGER_HEAP_MEMORY_MB);
-
-        return new ClusterSpecificationBuilder()
-                .setMasterMemoryMB(jobManagerMemoryMb)
-                .setTaskManagerMemoryMB(taskManagerMemoryMb)
-                .setNumberTaskManagers(1)
-                .setSlotsPerTaskManager(slots)
-                .createClusterSpecification();
     }
 
     /**

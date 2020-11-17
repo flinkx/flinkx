@@ -16,39 +16,36 @@
  * limitations under the License.
  */
 
+package com.flink.flinkx.util;
 
-package com.flink.flinkx.launcher;
-
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 
 /**
- * @author jiangbo
- * @date 2020/4/15
+ * @author tiezhu
  */
-public class PluginUtil {
+public class JsonModifyUtil {
 
-    public static List<File> getAllPluginPath(String flinkPluginRoot) {
-        List<File> pluginPaths = Lists.newArrayList();
-        if (StringUtils.isNotBlank(flinkPluginRoot)) {
-            try {
-                File[] jars = new File(flinkPluginRoot).listFiles();
-                if (jars != null) {
-                    pluginPaths.addAll(Arrays.asList(jars));
-                }
-            } catch (Exception e) {
-                throw new RuntimeException("Get jars from pluginRoot error", e);
+    public static String JsonValueReplace(String json, HashMap<String, String> parameter){
+        for(String item: parameter.keySet()){
+            if(json.contains("${"+item+"}")){
+                json = json.replace("${"+item+"}", parameter.get(item));
             }
         }
+        return json;
+    }
 
-        if (pluginPaths.size() == 0) {
-            throw new RuntimeException("jars in pluginRoot is null, flinkPluginRoot = " + flinkPluginRoot);
+    /**
+     * 将命令行中的修改命令转化为HashMap保存
+     */
+    public static HashMap<String, String> CommandTransform(String command) {
+        HashMap<String, String> parameter = new HashMap<>();
+        String[] split = StringUtils.split(command, ",");
+        for (String item : split) {
+            String[] temp = item.split("=");
+            parameter.put(temp[0], temp[1]);
         }
-
-        return pluginPaths;
+        return parameter;
     }
 }

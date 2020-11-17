@@ -42,8 +42,8 @@ public class JobConfig extends AbstractConfig {
         setting = new SettingConfig((Map<String, Object>) map.get(KEY_SETTING_CONFIG));
         content = new ArrayList<>();
         if(map.containsKey(KEY_CONTENT_CONFIG_LIST)) {
-            List<Map<String,Object>> contentList = (List<Map<String, Object>>) map.get(KEY_CONTENT_CONFIG_LIST);
-            for(Map<String,Object> contentMap : contentList) {
+            List<Map<String, Object>> contentList = (List<Map<String, Object>>) map.get(KEY_CONTENT_CONFIG_LIST);
+            for(Map<String, Object> contentMap : contentList) {
                 content.add(new ContentConfig(contentMap));
             }
         }
