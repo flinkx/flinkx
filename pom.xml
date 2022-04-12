@@ -26,7 +26,7 @@
         <scala.binary.version>2.10</scala.binary.version>
         <flink.version>1.11.2</flink.version>
         <flinkx.version>1.11.2</flinkx.version>
-        <hadoop.version>2.7.3</hadoop.version>
+        <hadoop.version>3.2.3</hadoop.version>
         <http.version>4.5.3</http.version>
         <dev.path>${basedir}/dev</dev.path>
         <package.name>release_1.8.6</package.name>
